@@ -88,6 +88,7 @@
         z-index: 2;
       }
       #photo-credit {
+        background-color: rgba(255, 255, 255, 0.125);
         bottom: 0;
         color: #fff;
         left: 0;
@@ -301,7 +302,7 @@
       const inputs = document.querySelectorAll("input");
 
       function resizeInput() {
-        this.style.width = `calc(${this.value.length}ch * 0.9)`;
+        this.style.width = `calc(${this.value.length}ch * 1)`;
       }
 
       const state = {
@@ -312,15 +313,21 @@
 
       const search = new URLSearchParams(window.location.search);
 
-      for (const [property, value] of search) {
-        state[property] = value;
+      if (search.has("q")) {
+        const data = JSON.parse(atob(search.get("q")));
+        for (const [property, value] of Object.entries(data)) {
+          state[property] = value;
+        }
+      } else {
+        for (const [property, value] of search) {
+          state[property] = value;
+        }
       }
 
       const update = (property, value) => {
         state[property] = value;
-        const search = new URLSearchParams(state);
         const url = new URL(window.location.href);
-        url.search = new URLSearchParams(state);
+        url.search = new URLSearchParams({ q: btoa(JSON.stringify(state)) });
         history.replaceState({}, "", url);
       };
 
